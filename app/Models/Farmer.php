@@ -9,5 +9,8 @@ class Farmer extends Model
     public function purchases()
     {
         return $this->hasMany(Purchase::class);
+
     }
+
+    protected $fillable = ['name', 'address', 'phone', 'nik'];
 }
