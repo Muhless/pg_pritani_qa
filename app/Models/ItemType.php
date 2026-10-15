@@ -15,4 +15,13 @@ class ItemType extends Model
     {
         return $this->hasOne(Stock::class);
     }
+    public const CATEGORIES = [
+        'grain' => 'Gabah',
+        'rice' => 'Beras',
+        'bran' => 'Bekatul',
+        'husk' => 'Sekam',
+        'broken_rice' => 'Menir',
+    ];
+
+    protected $fillable = ['name', 'category', 'unit'];
 }

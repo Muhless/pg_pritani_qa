@@ -10,4 +10,11 @@ class Customer extends Model
     {
         return $this->hasMany(Sale::class);
     }
+    public const TYPES = [
+        'store' => 'Toko',
+        'distributor' => 'Distributor',
+        'individual' => 'Perorangan',
+    ];
+
+    protected $fillable = ['name', 'address', 'phone', 'type'];
 }
