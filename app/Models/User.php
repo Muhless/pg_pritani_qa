@@ -22,6 +22,23 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
+
+    public const ROLES = [
+        'admin' => 'Admin',
+        'operator' => 'Operator Giling',
+        'cashier' => 'Kasir',
+    ];
+
+    public function canAccess(string $module): bool
+    {
+        return in_array($this->role, config('access.' . $module, []), true);
+    }
+
+    public function roleLabel(): string
+    {
+        return self::ROLES[$this->role] ?? (string) $this->role;
+    }
+
     protected function casts(): array
     {
         return [
