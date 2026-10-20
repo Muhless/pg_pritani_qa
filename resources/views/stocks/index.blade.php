@@ -7,7 +7,7 @@
     <div class="mb-6">
         <h1 class="font-display text-3xl font-bold text-paddy-dark">Stok Gudang</h1>
         <p class="mt-1 text-sm text-muted">
-            {{ $items->total() }} jenis barang · stok menipis jika ≤ {{ \App\Models\Stock::LOW_STOCK_KG }} kg
+            {{ $items->total() }} jenis barang · stok menipis jika &lt; {{ \App\Models\Stock::LOW_STOCK_KG }} kg
         </p>
     </div>
 
@@ -67,6 +67,7 @@
                     <th scope="col" class="px-4 py-3">Kategori</th>
                     <th scope="col" class="px-4 py-3 text-right">Stok</th>
                     <th scope="col" class="px-4 py-3">Status</th>
+                    <th scope="col" class="px-4 py-3 text-right">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -80,22 +81,34 @@
                                 {{ \App\Models\ItemType::CATEGORIES[$item->category] ?? $item->category }}
                             </span>
                         </td>
-                        <td data-testid="stock-qty" class="px-4 py-3 text-right font-semibold">
-                            {{ number_format($qty, 2, ',', '.') }} {{ $item->unit }}
-                        </td>
+                       <td data-testid="stock-qty" class="px-4 py-3 text-right font-semibold whitespace-nowrap">
+    {{ number_format($qty, 2, ',', '.') }} kg
+</td>
                         <td class="px-4 py-3">
                             @if ($qty <= 0)
                                 <span class="inline-block px-2 py-0.5 rounded-full bg-clay/10 text-clay text-xs font-medium">Habis</span>
-                            @elseif ($qty <= \App\Models\Stock::LOW_STOCK_KG)
+                            @elseif ($qty < \App\Models\Stock::LOW_STOCK_KG)
                                 <span class="inline-block px-2 py-0.5 rounded-full bg-wheat/20 text-clay text-xs font-medium">Menipis</span>
                             @else
                                 <span class="inline-block px-2 py-0.5 rounded-full bg-paddy-soft text-paddy-dark text-xs font-medium">Aman</span>
                             @endif
                         </td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center justify-end gap-2">
+                            <a href="{{ route('stocks.edit', $item) }}" data-testid="stock-edit-{{ $item->id }}"
+                                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-line text-xs font-medium text-paddy-dark whitespace-nowrap hover:bg-paddy-soft transition">
+                                <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path
+                                        d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                </svg>
+                                Update
+                            </a>
+                        </div>
+                    </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-4 py-10 text-center text-muted">Tidak ada data stok yang sesuai.</td>
+                        <td colspan="6" class="px-4 py-10 text-center text-muted">Tidak ada data stok yang sesuai.</td>
                     </tr>
                 @endforelse
             </tbody>

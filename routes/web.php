@@ -52,5 +52,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware(EnsureModuleAccess::class . ':stocks')->group(function () {
         Route::get('stocks', [StockController::class, 'index'])->name('stocks.index');
+        Route::get('stocks/{item}/edit', [StockController::class, 'edit'])->name('stocks.edit');
+        Route::put('stocks/{item}', [StockController::class, 'update'])->name('stocks.update');
     });
 });

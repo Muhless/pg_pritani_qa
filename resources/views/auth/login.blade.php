@@ -34,7 +34,7 @@
                     <label for="login_email" class="block text-sm font-medium mb-1">Email</label>
                     <input id="login_email" name="email" type="email" value="{{ old('email') }}"
                         autocomplete="username" placeholder="nama@pritani.test"
-                        class="w-full px-3 py-2 text-sm rounded-md border @error('email') border-clay @else border-line @enderror focus:outline-none focus:border-paddy">
+                        class="w-full px-3 py-2 text-sm rounded-md border @error('email') @else border-line @enderror focus:outline-none focus:border-paddy">
                     @error('email')
                         <p role="alert" class="mt-1 text-xs text-clay">{{ $message }}</p>
                     @enderror
@@ -44,7 +44,7 @@
                     <label for="login_password" class="block text-sm font-medium mb-1">Password</label>
                     <input id="login_password" name="password" type="password"
                         autocomplete="current-password" placeholder="Masukkan password"
-                        class="w-full px-3 py-2 text-sm rounded-md border @error('password') border-clay @else border-line @enderror focus:outline-none focus:border-paddy">
+                        class="w-full px-3 py-2 text-sm rounded-md border @error('password') border-clay @else @enderror focus:outline-none focus:border-paddy">
                     @error('password')
                         <p role="alert" class="mt-1 text-xs text-clay">{{ $message }}</p>
                     @enderror
