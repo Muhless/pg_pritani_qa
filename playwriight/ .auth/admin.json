@@ -1,0 +1,25 @@
+{
+  "cookies": [
+    {
+      "name": "XSRF-TOKEN",
+      "value": "eyJpdiI6InQzWE0wWWxjOURUZzZYS3o1NkNjQmc9PSIsInZhbHVlIjoiY0F2VXRYQUYyZ2RkOXk3TVE2TXVIL2luT1V3ekt4TXZEclBvUnZ6T2JIbVZHZ0w5aWlaWEROQ3BlQ0NWaGc1dE9KRjA3cTJxbUdUNzdQWUZSVE4rMDBVMVBPdksyNzQ0L1dxNWtITzd3VnBlRmgxVUhDVmF0ZGpVVWpQMjRlTmciLCJtYWMiOiI1NmVlZjZkOTIzZjdkZmE4YWVkNmZhM2Y3OTQ4MDUwYjExMmU0MjVlZWU4YTIxMGE1MzYxMjcxOGQyZjJiMzYyIiwidGFnIjoiIn0%3D",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1792727382.015719,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "pritani-session",
+      "value": "eyJpdiI6Im5HV3VTcjc3RCtvQ3RSenhIcnZqOWc9PSIsInZhbHVlIjoicVRGZnlaYjhBdHBITGVKV08wRXVCZGoyOUFYVlNkNWdDMnlRV2tXU3V2elRhbGlIaGVvbVdObmdqemFtcmR1SmRmVVBFZHZFajJid1VDNU12Yld4QVdQL2tqSzRJZjhhbk0xYlBGZURFUlRNcllmYmpCSlJCTjJPMDNGcGNudmoiLCJtYWMiOiJhODFkYmE4OGI0ZmUxZmU2YjQ1ODBlMzkyYWZkMTcxNzFhZTA5MzY3OTM3ZDk0OWE1MmMyNWVkYmRiZTg5Zjg1IiwidGFnIjoiIn0%3D",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1792727382.015793,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": []
+}

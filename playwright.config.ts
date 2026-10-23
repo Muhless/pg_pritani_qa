@@ -15,6 +15,11 @@ export default defineConfig({
       },
     },
     {
+      name: "auth",
+      testMatch: /login\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
       name: "chromium",
       testIgnore: /.*\.setup\.ts/,
       dependencies: ["setup"],
