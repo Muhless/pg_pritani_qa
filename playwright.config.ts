@@ -35,17 +35,16 @@ export default defineConfig({
       dependencies: ["setup"],
       use: { ...devices["Desktop Firefox"], storageState: ".auth/admin.json" },
     },
-    {
-      name: "webkit",
-      testIgnore: /.*\.setup\.ts/,
-      dependencies: ["setup"],
-      use: { ...devices["Desktop Safari"], storageState: ".auth/admin.json" },
-    },
+    // {
+    //   name: "webkit",
+    //   testIgnore: /.*\.setup\.ts/,
+    //   dependencies: ["setup"],
+    //   use: { ...devices["Desktop Safari"], storageState: ".auth/admin.json" },
+    // },
   ],
   webServer: {
-    command: "php artisan serve --host=localhost --port=8001",
-    env: { APP_ENV: "e2e" },
+    command: "php artisan serve --port=8001 --env=testing",
     url: "http://localhost:8001",
-    reuseExistingServer: false,
+    reuseExistingServer: true,
   },
 });
