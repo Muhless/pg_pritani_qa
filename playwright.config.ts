@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: "./e2e",
   globalSetup: "./global-setup.ts",
   use: {
-    baseURL: "http://localhost:8001",
+    baseURL: "http://127.0.0.1:8001",
   },
   projects: [
     {
@@ -43,8 +43,16 @@ export default defineConfig({
     // },
   ],
   webServer: {
-    command: "php artisan serve --port=8001 --env=testing",
-    url: "http://localhost:8001",
+    command:
+      "php -S 127.0.0.1:8001 ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php",
+    cwd: "./public",
+    url: "http://127.0.0.1:8001/login",
     reuseExistingServer: true,
+    timeout: 120000,
+    stdout: "pipe",
+    stderr: "pipe",
+    env: {
+      APP_ENV: "testing",
+    },
   },
 });

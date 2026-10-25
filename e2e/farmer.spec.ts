@@ -2,7 +2,7 @@ import test, { expect } from "@playwright/test";
 
 test("Header title is displayed", async ({ page }) => {
   await page.goto("/farmers");
-  await expect(page.getByText("/Petani")).toBeVisible;
+  await expect(page.getByRole("heading", { name: "Petani" })).toBeVisible;
 });
 
 test("Create farmer data", async ({ page }) => {
