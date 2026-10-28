@@ -5,7 +5,7 @@
 @section('content')
      <div class="mb-8">
           <h1 class="font-display text-3xl font-bold text-paddy-dark">Ringkasan Hari Ini</h1>
-          <p class="mt-1 text-sm text-muted">{{ now()->translatedFormat('l, d F Y') }}</p>
+          <p class="mt-1 text-sm text-muted">{{ now()->locale('id')->translatedFormat('l, d F Y') }}</p>
      </div>
 
      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">

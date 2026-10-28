@@ -2,7 +2,7 @@ import test, { expect } from "@playwright/test";
 
 test("Customer heading is displayed", async ({ page }) => {
   await page.goto("/customers");
-  await expect(page.getByRole("heading", { name: "Pelanggan" })).toBeVisible;
+  await expect(page.getByRole("heading", { name: "Pelanggan" })).toBeVisible();
 });
 
 test("Create customer data", async ({ page }) => {

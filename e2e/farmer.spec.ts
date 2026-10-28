@@ -2,7 +2,7 @@ import test, { expect } from "@playwright/test";
 
 test("Header title is displayed", async ({ page }) => {
   await page.goto("/farmers");
-  await expect(page.getByRole("heading", { name: "Petani" })).toBeVisible;
+  await expect(page.getByRole("heading", { name: "Petani" })).toBeVisible();
 });
 
 test("Create farmer data", async ({ page }) => {
@@ -13,5 +13,5 @@ test("Create farmer data", async ({ page }) => {
   await page.getByLabel("Nomor Telepon").fill("088711165552");
   await page.getByLabel("Alamat").fill("Kp. Durian runtuh, blok J12");
   await page.getByRole("button", { name: "Simpan" }).click();
-  await expect(page.getByText("Adam Wharton")).toBeVisible;
+  await expect(page.getByText("Adam Wharton")).toBeVisible();
 });

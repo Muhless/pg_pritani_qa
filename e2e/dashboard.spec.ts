@@ -3,7 +3,7 @@ import test, { expect } from "@playwright/test";
 test("Header title is displayed", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Ringkasan Hari Ini" }))
-    .toBeVisible;
+    .toBeVisible();
 });
 
 test("Today's date is displayed", async ({ page }) => {
@@ -12,5 +12,5 @@ test("Today's date is displayed", async ({ page }) => {
     timeZone: "Asia/Jakarta",
   }).format(new Date());
   await page.goto("/");
-  await expect(page.getByText(today)).toBeVisible;
+  await expect(page.getByText(today)).toBeVisible();
 });
