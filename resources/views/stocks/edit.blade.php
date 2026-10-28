@@ -37,7 +37,8 @@
 
           <div>
                <label for="note" class="block text-xs font-medium text-muted mb-1">Catatan (opsional)</label>
-               <input id="note" name="note" type="text" value="{{ old('note') }}"
+               <input id="note" name="note" type="text" value="{{ old('note') }}" maxlength="255"
+                    placeholder="Contoh: koreksi susut, hasil timbangan ulang"
                     class="w-full px-3 py-2 text-sm rounded-md border border-line bg-white focus:outline-none focus:border-paddy">
                @error('note')
                <p class="mt-1 text-xs text-clay">{{ $message }}</p> @enderror
@@ -54,4 +55,57 @@
                </a>
           </div>
      </form>
+
+     {{-- Riwayat perubahan stok --}}
+     <div class="mt-8 max-w-2xl" data-testid="stock-history">
+          <h2 class="font-display text-xl font-bold text-paddy-dark">Riwayat Perubahan Stok</h2>
+          <p class="mt-1 mb-4 text-sm text-muted">20 perubahan terakhir untuk {{ $item->name }}.</p>
+
+          <div class="bg-card border border-line rounded-lg overflow-hidden">
+               <table class="w-full text-sm">
+                    <thead class="bg-paddy-soft text-paddy-dark">
+                         <tr class="text-left">
+                              <th scope="col" class="px-4 py-3">Tanggal</th>
+                              <th scope="col" class="px-4 py-3">Jenis</th>
+                              <th scope="col" class="px-4 py-3 text-right">Jumlah</th>
+                              <th scope="col" class="px-4 py-3 text-right">Stok</th>
+                              <th scope="col" class="px-4 py-3">Catatan</th>
+                              <th scope="col" class="px-4 py-3">Oleh</th>
+                         </tr>
+                    </thead>
+                    <tbody>
+                         @forelse ($movements as $movement)
+                              <tr class="border-t border-line hover:bg-paper/60">
+                                   <td class="px-4 py-3 whitespace-nowrap text-muted">
+                                        {{ $movement->created_at->format('d/m/Y H:i') }}
+                                   </td>
+                                   <td class="px-4 py-3">
+                                        <span
+                                             class="inline-block px-2 py-0.5 rounded-full text-xs font-medium {{ $movement->type === 'in' ? 'bg-paddy-soft text-paddy-dark' : 'bg-clay/10 text-clay' }}">
+                                             {{ \App\Models\StockMovement::TYPES[$movement->type] ?? $movement->type }}
+                                        </span>
+                                   </td>
+                                   <td class="px-4 py-3 text-right font-semibold whitespace-nowrap">
+                                        {{ $movement->type === 'in' ? '+' : ($movement->type === 'out' ? '−' : '') }}{{ number_format((float) $movement->amount, 2, ',', '.') }}
+                                        {{ $item->unit }}
+                                   </td>
+                                   <td class="px-4 py-3 text-right whitespace-nowrap text-muted">
+                                        {{ number_format((float) $movement->quantity_before, 2, ',', '.') }}
+                                        &rarr;
+                                        {{ number_format((float) $movement->quantity_after, 2, ',', '.') }}
+                                   </td>
+                                   <td class="px-4 py-3">{{ $movement->note ?: '—' }}</td>
+                                   <td class="px-4 py-3 text-muted">{{ $movement->user->name ?? '—' }}</td>
+                              </tr>
+                         @empty
+                              <tr>
+                                   <td colspan="6" class="px-4 py-10 text-center text-muted">
+                                        Belum ada perubahan stok yang tercatat.
+                                   </td>
+                              </tr>
+                         @endforelse
+                    </tbody>
+               </table>
+          </div>
+     </div>
 @endsection

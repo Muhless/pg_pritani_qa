@@ -15,6 +15,12 @@ class ItemType extends Model
     {
         return $this->hasOne(Stock::class);
     }
+
+    public function stockMovements()
+    {
+        return $this->hasMany(StockMovement::class);
+    }
+
     public const CATEGORIES = [
         'grain' => 'Gabah',
         'rice' => 'Beras',

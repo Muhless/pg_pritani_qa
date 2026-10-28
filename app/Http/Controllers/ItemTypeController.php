@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ItemType;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class ItemTypeController extends Controller
@@ -30,7 +31,10 @@ class ItemTypeController extends Controller
     {
         $validated = $request->validate($this->rules($request), $this->messages());
 
-        ItemType::create($validated);
+        DB::transaction(function () use ($validated) {
+            $itemType = ItemType::create($validated);
+            $itemType->stock()->create(['quantity_kg' => 0]);
+        });
 
         return redirect()->route('item-types.index')
             ->with('success', 'Jenis barang berhasil ditambahkan.');
