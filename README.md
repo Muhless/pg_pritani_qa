@@ -6,15 +6,16 @@
 ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14%2B-4169E1?logo=postgresql&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
-![Playwright](https://img.shields.io/badge/Playwright-1.64-2EAD33?logo=playwright&logoColor=white)
-[![Playwright Tests](https://github.com/Muhless/pg_pritani_qa/actions/workflows/playwright.yml/badge.svg)](https://github.com/Muhless/pg_pritani_qa/actions/workflows/playwright.yml)
+![Selenium](https://img.shields.io/badge/Selenium-4.52-43B02A?logo=selenium&logoColor=white)
+![Java](https://img.shields.io/badge/Java-21-ED8B00?logo=openjdk&logoColor=white)
+[![E2E](https://github.com/Muhless/pg_pritani_qa/actions/workflows/e2e.yml/badge.svg)](https://github.com/Muhless/pg_pritani_qa/actions/workflows/e2e.yml)
 
 Pritani is a Laravel + PostgreSQL application for a small rice mill (*penggilingan padi*). It records
 grain purchases from farmers, mills grain into rice and by-products, sells the output to customers,
 and keeps stock in sync at every step.
 
 I built it as the subject of my QA practice. The interesting part of this repository is not only the
-application, but **how it is tested**: risk-based test design, a Playwright end-to-end suite, CI on
+application, but **how it is tested**: risk-based test design, a Selenium Java end-to-end suite, CI on
 every push and pull request, and documented bug investigations.
 
 > The UI is in Indonesian because the domain is a real Indonesian rice mill. Code, tests, and this
@@ -108,80 +109,76 @@ Coverage is prioritised by business risk rather than by screen count:
 3. **Boundary and negative paths** — zero and negative quantities, over-milling, missing due dates,
    invalid credentials, empty required fields.
 4. **Core CRUD and navigation** — create, list, filter, paginate, and confirm the record appears.
-5. **Exploratory sessions** — free-form passes over new features to find issues that scripted cases miss.
+5. **Exploratory sessions** — free-form passes over new features to find issues that scripted checks miss.
 
-### What is automated
+### Execution approach
 
-The end-to-end suite uses **Playwright + TypeScript** and targets the real application over HTTP.
+The end-to-end suite uses **Selenium WebDriver + Java 21 + TestNG** and targets the real application
+over HTTP. The scaffold is in place; scenarios are added as the suite grows.
 
 | Concern | How it is handled |
 | --- | --- |
-| Deterministic data | `global-setup.ts` runs `migrate:fresh --seed` against the testing database before every suite run. |
-| Authentication reuse | `e2e/auth.setup.ts` logs in once per role and persists `storageState`, so specs start authenticated. |
-| Environment isolation | `webServer` boots the PHP built-in server with `APP_ENV=testing` on port `8001`. |
-| Cross-browser | Chromium and Firefox projects; WebKit is scaffolded but currently disabled. |
-| Reporting | Playwright HTML report, uploaded as a CI artifact on every run. |
-| Page objects | Scaffolded in `e2e/pages/` to keep selectors out of specs as the suite grows. |
+| Deterministic data | `e2e-java/run-e2e.sh` runs `migrate:fresh --seed` against a disposable Postgres database before every run. |
+| Environment isolation | The app boots with `APP_ENV=e2e` on `http://127.0.0.1:8001`, separate from the dev database. |
+| Cross-browser | Chrome by default; Firefox and Edge are selectable with `-Dbrowser`. |
+| Browser/driver setup | Selenium Manager resolves the driver and downloads Chrome for Testing when no browser is installed. |
+| Reporting | TestNG/Surefire reports plus a screenshot for every failed test. |
+| Starter kit | `BaseTest` provides the driver lifecycle, an explicit wait, and a `visit()` helper; page objects are added under `pages/`. |
 
 Representative test design decisions:
 
 - Assertions target **user-visible behaviour** (headings, table rows, URL, error messages) rather
   than implementation details.
-- Login is tested for all three roles, for invalid credentials, and for remember-me cookie behaviour.
+- Login should be covered for all three roles, for invalid credentials, and for remember-me cookie
+  behaviour.
 - Created records are verified by searching for them in the rendered table, not by checking the
   database directly — the tests exercise the same path a user takes.
+- Test data uses a timestamp suffix so a test can run repeatedly without a database reset.
 
 ---
 
 ## Test coverage
 
-Legend: ✅ automated · 🟡 partial · ⬜ manual only
+Legend: ✅ automated · 🟡 partial · ⬜ not yet covered
 
-| Area | Key scenarios | Automated |
+| Area | Key scenarios | Status |
 | --- | --- | :---: |
-| Authentication | Valid login (admin, operator, cashier), invalid credentials, remember me on/off | ✅ |
-| Dashboard | Page renders, localized current date | ✅ |
-| Farmers | List page, create farmer and see it in the table | ✅ |
-| Customers | List page, create customer and see it in the table | ✅ |
-| Authorization | Role-specific menu visibility and `403` on forbidden modules | 🟡 |
+| Authentication | Valid login (admin, operator, cashier), invalid credentials, remember me on/off | ⬜ |
+| Dashboard | Page renders, localized current date | ⬜ |
+| Farmers | List page, create farmer and see it in the table | ⬜ |
+| Customers | List page, create customer and see it in the table | ⬜ |
+| Authorization | Role-specific menu visibility and `403` on forbidden modules | ⬜ |
 | Item types | Create, edit, delete, validation | ⬜ |
 | Purchases | Net weight and total price calculation, moisture deduction, stock increase | ⬜ |
 | Milling | Output limits versus input, yield calculation, by-product stock | ⬜ |
 | Sales | Multi-item totals, stock deduction, credit due date, mark as paid | ⬜ |
 | Stock | Low-stock filter, corrections, audit history, no negative stock | ⬜ |
 
-Automated specs live in `e2e/`:
+### Running the E2E suite
 
-```text
-e2e/
-├── auth.setup.ts      # one-time login per role, saves storage state
-├── auth.spec.ts       # login scenarios and remember-me behaviour
-├── dashboard.spec.ts  # dashboard rendering
-├── farmer.spec.ts     # farmer list and creation
-├── customer.spec.ts   # customer list and creation
-└── pages/             # page objects
-```
-
-### Running the suite
+Prerequisites: Java 21+, Maven, PHP 8.3+ with `pdo_pgsql`, PostgreSQL binaries, and Node.js for the
+frontend build.
 
 ```bash
-# one-time: create the test database (see .env.testing for credentials)
-createdb db_pritani_e2e
-
-npx playwright test                    # full suite (Chromium + Firefox)
-npx playwright test --project=chromium # single browser
-npx playwright test --ui               # interactive mode
-npx playwright show-report             # open the last HTML report
+./e2e-java/run-e2e.sh                  # reset e2e database, boot the app, run all tests
+./e2e-java/run-e2e.sh serve            # boot database + app and keep them running
+./e2e-java/run-e2e.sh db               # start the e2e database only
+./e2e-java/run-e2e.sh db:stop          # stop the e2e database
+cd e2e-java && mvn test                # run against an app already listening on :8001
+cd e2e-java && mvn test -Dheadless=false   # watch the browser
+cd e2e-java && mvn test -Dtest=AuthTest    # single test class
 ```
 
-`global-setup.ts` resets **only** the testing database before each run. Point `DB_DATABASE` in
-`.env.testing` at a disposable database.
+The suite currently has no test classes; add them under `e2e-java/src/test/java/id/pritani/e2e/tests/`
+(see `e2e-java/README.md` for an example). `run-e2e.sh` boots a disposable Postgres cluster in
+`database/.pgsql-e2e` and resets it with `migrate:fresh --seed` on every run. Failed tests save
+screenshots to `e2e-java/target/screenshots/`.
 
 ### Continuous integration
 
-`.github/workflows/playwright.yml` installs dependencies and browsers, runs the suite on every push
-and pull request to `main`/`master`, and uploads `playwright-report/` as an artifact (retained for
-30 days). The badge at the top of this file reflects the latest run.
+`.github/workflows/e2e.yml` installs PHP, Java 21, Node, and Chrome on every push and pull request to
+`main`/`master`, runs the Selenium suite, and uploads the Surefire reports and failure screenshots as
+an artifact. The badge at the top of this file reflects the latest run.
 
 ---
 
@@ -231,7 +228,7 @@ assertions.
 | Views | Blade + Tailwind CSS 4 |
 | Frontend behaviour | Alpine.js, SweetAlert2, Flatpickr |
 | Build tool | Vite 8 |
-| Test automation | Playwright 1.64 + TypeScript |
+| Test automation | Selenium 4.52 + Java 21 + TestNG |
 | CI | GitHub Actions |
 
 ---
@@ -342,9 +339,7 @@ database/
 resources/views/          # Blade views (Indonesian UI)
 routes/web.php            # module-grouped routes
 
-e2e/                      # Playwright specs, setup, and page objects
-global-setup.ts           # resets and seeds the test database
-playwright.config.ts      # projects, web server, storage state
+e2e-java/                 # Selenium Java suite (page objects, tests, TestNG suite)
 .github/workflows/        # CI pipeline
 ```
 
@@ -357,9 +352,8 @@ Documenting what is *not* covered yet is part of the QA discipline:
 - [ ] Automate purchases, milling, sales, and stock corrections — the highest-risk remaining areas.
 - [ ] Add explicit authorization tests for `403` responses on each role × module pair.
 - [ ] Add PHPUnit feature tests for the calculation rules (net weight, totals, yield) so they run
-      faster than E2E and closer to the code.
+      faster than manual end-to-end checks and closer to the code.
 - [ ] Add a seeding profile with realistic operational data so reviewers can explore immediately.
-- [ ] Enable the WebKit project and add mobile viewport runs.
 - [ ] Add accessibility checks and visual regression snapshots.
 - [ ] Add traceability artifacts: a test plan, a case catalogue, and bug report templates.
 
@@ -370,7 +364,7 @@ Documenting what is *not* covered yet is part of the QA discipline:
 Built and tested by **[Muhless](https://github.com/Muhless)** as a QA portfolio project.
 
 - Repository: [github.com/Muhless/pg_pritani_qa](https://github.com/Muhless/pg_pritani_qa)
-- Stack: Laravel, PostgreSQL, Tailwind CSS, Playwright
+- Stack: Laravel, PostgreSQL, Tailwind CSS, Selenium Java
 - Focus: end-to-end testing of money- and inventory-critical workflows
 
 The application contains no production data. Feedback on test design and coverage is welcome via

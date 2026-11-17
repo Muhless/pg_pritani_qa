@@ -1,9 +1,5 @@
-
-# Playwright
 node_modules/
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-/playwright/.auth/
-/.auth
+/public/build
+/e2e-java/target
+/.env.e2e
+/database/.pgsql-e2e
