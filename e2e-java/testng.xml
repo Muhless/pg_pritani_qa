@@ -1,8 +1,0 @@
-<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Pritani E2E" verbose="1" parallel="classes" thread-count="2">
-    <test name="Pritani">
-        <packages>
-            <package name="id.pritani.e2e.tests"/>
-        </packages>
-    </test>
-</suite>

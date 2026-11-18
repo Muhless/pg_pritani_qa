@@ -6,17 +6,14 @@
 ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14%2B-4169E1?logo=postgresql&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
-![Selenium](https://img.shields.io/badge/Selenium-4.52-43B02A?logo=selenium&logoColor=white)
-![Java](https://img.shields.io/badge/Java-21-ED8B00?logo=openjdk&logoColor=white)
-[![E2E](https://github.com/Muhless/pg_pritani_qa/actions/workflows/e2e.yml/badge.svg)](https://github.com/Muhless/pg_pritani_qa/actions/workflows/e2e.yml)
 
 Pritani is a Laravel + PostgreSQL application for a small rice mill (*penggilingan padi*). It records
 grain purchases from farmers, mills grain into rice and by-products, sells the output to customers,
 and keeps stock in sync at every step.
 
 I built it as the subject of my QA practice. The interesting part of this repository is not only the
-application, but **how it is tested**: risk-based test design, a Selenium Java end-to-end suite, CI on
-every push and pull request, and documented bug investigations.
+application, but **how it is tested**: risk-based test design, documented test coverage, and
+documented bug investigations.
 
 > The UI is in Indonesian because the domain is a real Indonesian rice mill. Code, tests, and this
 > documentation are in English.
@@ -113,72 +110,42 @@ Coverage is prioritised by business risk rather than by screen count:
 
 ### Execution approach
 
-The end-to-end suite uses **Selenium WebDriver + Java 21 + TestNG** and targets the real application
-over HTTP. The scaffold is in place; scenarios are added as the suite grows.
+Coverage is executed manually against the real application over HTTP, focused on the paths below.
 
 | Concern | How it is handled |
 | --- | --- |
-| Deterministic data | `e2e-java/run-e2e.sh` runs `migrate:fresh --seed` against a disposable Postgres database before every run. |
-| Environment isolation | The app boots with `APP_ENV=e2e` on `http://127.0.0.1:8001`, separate from the dev database. |
-| Cross-browser | Chrome by default; Firefox and Edge are selectable with `-Dbrowser`. |
-| Browser/driver setup | Selenium Manager resolves the driver and downloads Chrome for Testing when no browser is installed. |
-| Reporting | TestNG/Surefire reports plus a screenshot for every failed test. |
-| Starter kit | `BaseTest` provides the driver lifecycle, an explicit wait, and a `visit()` helper; page objects are added under `pages/`. |
+| Deterministic data | A fresh database seeded with demo users before each test pass. |
+| Authentication reuse | Log in once per role and reuse the session while exploring each module. |
+| Environment isolation | The testing environment runs against a disposable database. |
+| Cross-browser | Checks are performed in Chromium and Firefox. |
+| Evidence | Findings are captured with screenshots and reproduction steps. |
 
 Representative test design decisions:
 
-- Assertions target **user-visible behaviour** (headings, table rows, URL, error messages) rather
+- Checks target **user-visible behaviour** (headings, table rows, URL, error messages) rather
   than implementation details.
-- Login should be covered for all three roles, for invalid credentials, and for remember-me cookie
-  behaviour.
+- Login is tested for all three roles, for invalid credentials, and for remember-me cookie behaviour.
 - Created records are verified by searching for them in the rendered table, not by checking the
-  database directly — the tests exercise the same path a user takes.
-- Test data uses a timestamp suffix so a test can run repeatedly without a database reset.
+  database directly — the checks exercise the same path a user takes.
 
 ---
 
 ## Test coverage
 
-Legend: ✅ automated · 🟡 partial · ⬜ not yet covered
+Legend: ✅ tested · 🟡 partial · ⬜ not yet covered
 
 | Area | Key scenarios | Status |
 | --- | --- | :---: |
-| Authentication | Valid login (admin, operator, cashier), invalid credentials, remember me on/off | ⬜ |
-| Dashboard | Page renders, localized current date | ⬜ |
-| Farmers | List page, create farmer and see it in the table | ⬜ |
-| Customers | List page, create customer and see it in the table | ⬜ |
-| Authorization | Role-specific menu visibility and `403` on forbidden modules | ⬜ |
+| Authentication | Valid login (admin, operator, cashier), invalid credentials, remember me on/off | ✅ |
+| Dashboard | Page renders, localized current date | ✅ |
+| Farmers | List page, create farmer and see it in the table | ✅ |
+| Customers | List page, create customer and see it in the table | ✅ |
+| Authorization | Role-specific menu visibility and `403` on forbidden modules | 🟡 |
 | Item types | Create, edit, delete, validation | ⬜ |
 | Purchases | Net weight and total price calculation, moisture deduction, stock increase | ⬜ |
 | Milling | Output limits versus input, yield calculation, by-product stock | ⬜ |
 | Sales | Multi-item totals, stock deduction, credit due date, mark as paid | ⬜ |
 | Stock | Low-stock filter, corrections, audit history, no negative stock | ⬜ |
-
-### Running the E2E suite
-
-Prerequisites: Java 21+, Maven, PHP 8.3+ with `pdo_pgsql`, PostgreSQL binaries, and Node.js for the
-frontend build.
-
-```bash
-./e2e-java/run-e2e.sh                  # reset e2e database, boot the app, run all tests
-./e2e-java/run-e2e.sh serve            # boot database + app and keep them running
-./e2e-java/run-e2e.sh db               # start the e2e database only
-./e2e-java/run-e2e.sh db:stop          # stop the e2e database
-cd e2e-java && mvn test                # run against an app already listening on :8001
-cd e2e-java && mvn test -Dheadless=false   # watch the browser
-cd e2e-java && mvn test -Dtest=AuthTest    # single test class
-```
-
-The suite currently has no test classes; add them under `e2e-java/src/test/java/id/pritani/e2e/tests/`
-(see `e2e-java/README.md` for an example). `run-e2e.sh` boots a disposable Postgres cluster in
-`database/.pgsql-e2e` and resets it with `migrate:fresh --seed` on every run. Failed tests save
-screenshots to `e2e-java/target/screenshots/`.
-
-### Continuous integration
-
-`.github/workflows/e2e.yml` installs PHP, Java 21, Node, and Chrome on every push and pull request to
-`main`/`master`, runs the Selenium suite, and uploads the Surefire reports and failure screenshots as
-an artifact. The badge at the top of this file reflects the latest run.
 
 ---
 
@@ -228,8 +195,6 @@ assertions.
 | Views | Blade + Tailwind CSS 4 |
 | Frontend behaviour | Alpine.js, SweetAlert2, Flatpickr |
 | Build tool | Vite 8 |
-| Test automation | Selenium 4.52 + Java 21 + TestNG |
-| CI | GitHub Actions |
 
 ---
 
@@ -338,9 +303,6 @@ database/
 
 resources/views/          # Blade views (Indonesian UI)
 routes/web.php            # module-grouped routes
-
-e2e-java/                 # Selenium Java suite (page objects, tests, TestNG suite)
-.github/workflows/        # CI pipeline
 ```
 
 ---
@@ -364,8 +326,8 @@ Documenting what is *not* covered yet is part of the QA discipline:
 Built and tested by **[Muhless](https://github.com/Muhless)** as a QA portfolio project.
 
 - Repository: [github.com/Muhless/pg_pritani_qa](https://github.com/Muhless/pg_pritani_qa)
-- Stack: Laravel, PostgreSQL, Tailwind CSS, Selenium Java
-- Focus: end-to-end testing of money- and inventory-critical workflows
+- Stack: Laravel, PostgreSQL, Tailwind CSS
+- Focus: manual end-to-end testing of money- and inventory-critical workflows
 
 The application contains no production data. Feedback on test design and coverage is welcome via
 GitHub issues.
