@@ -10,7 +10,11 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\StockController;
 use App\Http\Middleware\EnsureModuleAccess;
+use App\Models\Customer;
+use App\Models\ItemType;
+use App\Models\Stock;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -58,4 +62,42 @@ Route::middleware('auth')->group(function () {
         Route::get('stocks/{item}/edit', [StockController::class, 'edit'])->name('stocks.edit');
         Route::put('stocks/{item}', [StockController::class, 'update'])->name('stocks.update');
     });
+
+
+
 });
+
+
+if (app()->environment('testing')) {
+    Route::post('/_test/customers', function (Request $request) {
+        return Customer::create($request->validate([
+            'name' => "required",
+            'phone' => 'nullable',
+            'address' => 'nullable'
+        ]));
+    })->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class);
+
+
+    Route::post('/_test/item-types', function (Request $request) {
+        $data = $request->validate([
+            'name' => 'required',
+            'category' => 'required|in:grain,rice,bran,husk,broken_rice',
+            'unit' => 'nullable',
+            'quantity_kg' => 'nullable|numeric',
+        ]);
+
+        $item = ItemType::create([
+            'name' => $data['name'],
+            'category' => $data['category'],
+            'unit' => $data['unit'] ?? 'kg',
+        ]);
+
+        // stocks.item_type_id UNIQUE, jadi updateOrCreate mencegah duplikat
+        $stock = Stock::updateOrCreate(
+            ['item_type_id' => $item->id],
+            ['quantity_kg' => $data['quantity_kg'] ?? 0],
+        );
+
+        return response()->json(['item' => $item, 'stock' => $stock], 201);
+    });
+}

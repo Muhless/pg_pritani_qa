@@ -25,9 +25,9 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: "DB_DATABASE=db_pritani_test php artisan serve --port=8001",
+    command: "APP_ENV=testing DB_DATABASE=db_pritani_test php artisan serve --port=8001",
     url: "http://127.0.0.1:8001",
-    reuseExistingServer: true,
+    reuseExistingServer: false,
   },
 
   projects: [

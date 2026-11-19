@@ -1,5 +1,5 @@
 import test from "@playwright/test";
-import { ProductPage } from "./ProductPage";
+import { ProductPage } from "./pages/ProductPage";
 
 test("Add product type", async ({ page }) => {
   const productPage = new ProductPage(page);
