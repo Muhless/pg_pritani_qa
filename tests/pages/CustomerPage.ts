@@ -28,9 +28,9 @@ export class CustomerPage {
     this.submitButton = page.getByRole("button", { name: "Simpan" });
 
     this.confirmDialog = page.getByRole("dialog");
-   this.confirmDeleteButton = this.confirmDialog.getByRole("button", {
-     name: /ya,?\s*hapus/i,
-   });
+    this.confirmDeleteButton = this.confirmDialog.getByRole("button", {
+      name: /ya,?\s*hapus/i,
+    });
     this.cancelDeleteButton = this.confirmDialog.getByRole("button", {
       name: "Batal",
     });
@@ -60,6 +60,31 @@ export class CustomerPage {
     await expect(
       this.page.getByRole("row", { name: new RegExp(name) }),
     ).toBeVisible();
+  }
+
+  async editCustomer(
+    name: string,
+    data: { name?: string; type?: string; phone?: string; address?: string },
+  ) {
+    const row = this.page.getByRole("row", { name });
+    await row.getByRole("button", { name: "Edit" }).click();
+    const dialog = this.page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+
+    if (data.name != undefined) {
+      await this.nameInput.fill(data.name);
+    }
+    if (data.type != undefined) {
+      await this.typeSelect.selectOption(data.type);
+    }
+    if (data.phone != undefined) {
+      await this.phoneInput.fill(data.phone);
+    }
+    if (data.address != undefined) {
+      await this.addressInput.fill(data.address);
+    }
+
+    await this.submitButton.click();
   }
 
   async deleteCustomer(name: string) {

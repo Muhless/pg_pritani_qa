@@ -30,7 +30,6 @@ test("Add sales", { tag: "@smoke" }, async ({ page, request }) => {
     { item: item1, weight: "10", price: "15000" },
     { item: item2, weight: "15", price: "20000" },
   ]);
-  await page.pause();
   await salesPage.submit();
   await salesPage.expectSalesAdded(customerName);
 });
